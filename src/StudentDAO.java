@@ -20,7 +20,7 @@ class StudentDAO {
 
     private Connection con=null;
     private Statement statement=null;
-
+    private String query=null;
     private void connect(){
         try {
             final  String url="jdbc:mysql://localhost:3306/Student";
@@ -28,7 +28,7 @@ class StudentDAO {
             final  String password="#Indrani20";
             con = DriverManager.getConnection(url, user, password);
             statement = con.createStatement();
-            String query="USE Student";
+            query="USE Student";
             statement.executeUpdate(query);
             query = "SET SQL_SAFE_UPDATES = 0 ";
             statement.executeUpdate(query);
@@ -38,7 +38,7 @@ class StudentDAO {
         }
     }
 //    protected void createDatabase(String database) {
-//        String query="CREATE DATABASE IF NOT EXISTS "+database;
+//        query="CREATE DATABASE IF NOT EXISTS "+database;
 //        connect();
 //        try {
 //            statement.executeUpdate(query);
@@ -50,7 +50,7 @@ class StudentDAO {
 protected void createTable(String tableName){
 
         connect();
-        String query="create table  if not exists "+tableName+"( roll int primary key,studentName varchar(100)," +
+       query="create table  if not exists "+tableName+"( roll int primary key,studentName varchar(100)," +
                 "guardianName varchar(100),address varchar(150),contact bigint ,className varchar(5),dob DATE);";
         try {
             statement.executeUpdate(query);
@@ -63,7 +63,7 @@ protected void createTable(String tableName){
 protected void deleteTable(String tableName){
 
     connect();
-    String query="drop table if exists "+tableName;
+    query="drop table if exists "+tableName;
     try {
         statement.executeUpdate(query);
     }
@@ -79,7 +79,7 @@ protected void deleteTable(String tableName){
         }
         connect();
 
-        String query = "INSERT INTO "+tableName+" (roll  ,studentName,className,dob,contact,guardianName,address)" +
+        query = "INSERT INTO "+tableName+" (roll ,studentName,className,dob,contact,guardianName,address)" +
                 "values (?,?, ?,?, ?,?,?)";
 
         try (PreparedStatement pstatement = con.prepareStatement(query)) {
@@ -114,7 +114,7 @@ protected void deleteTable(String tableName){
 
     protected void showTable(String tableName){
         connect();
-        String query="select * from "+tableName;
+        query="select * from "+tableName +" order by roll asc";
         try {
             ResultSet resultset = statement.executeQuery(query);
             while(resultset.next()){
@@ -129,7 +129,7 @@ protected void deleteTable(String tableName){
     protected void selectByName(String tableName,String studentName){
         connect();
         //Don't use String.format() method as it can inject attack
-        String query = "select * from " + tableName + " where studentName = ? ";
+        query = "select * from " + tableName + " where studentName = ? ";
 
         try {
             PreparedStatement preparedStatement = con.prepareStatement(query);
@@ -150,7 +150,7 @@ protected void deleteTable(String tableName){
     protected void selectByRoll(String tableName,int roll){
         connect();
         //Don't use String.format() method as it can inject attack
-        String query = "select * from " + tableName + " where roll = ? ";
+        query = "select * from " + tableName + " where roll = ? ";
 
         try {
             PreparedStatement preparedStatement = con.prepareStatement(query);
@@ -166,7 +166,106 @@ protected void deleteTable(String tableName){
         }
         finally{
         closeConnection();
+        }
     }
+    protected void numberOfStudent(String tableName){
+        connect();
+        query="select count(roll) as value from "+tableName;
+        try {
+            ResultSet resultset=statement.executeQuery(query);
+            resultset.next();
+            System.out.println(resultset.getInt("value")+" student's data exist in the database");
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
+    }
+    protected void eraseData(String tableName){
+        connect();
+        query="truncate table "+tableName;
+        try {
+            statement.executeUpdate(query);
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
+    }
+    protected void showColumnName(String tableName){
+        connect();
+        query="describe "+tableName;
+        try {
+            ResultSet resultset=statement.executeQuery(query);
+            while(resultset.next()){
+                System.out.println(resultset.getString(1));
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
+    }
+    protected void deleteColumn(String tableName,String colName){
+        connect();
+        query="alter table "+tableName+" drop column "+colName;
+        try {
+            int count=statement.executeUpdate(query);
+            if(count==0){
+                System.out.println("column is deleted successfully");
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
+    }
+    protected void createColumn(String tableName,String colName,int dataType){
+        connect();
+        if(dataType==0){
+            query="alter table "+tableName+" add column "+colName+" int";
+        }
+        else{
+            query="alter table "+tableName+" add column "+colName+" varchar(200)";
+        }
+        try {
+            int count=statement.executeUpdate(query);
+            if(count==0){
+                System.out.println("column is added successfully");
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
+    }
+    protected void renameTableName(String tableName,String newTableName){
+        connect();
+        query="alter table "+tableName+" rename to "+newTableName;
+        try {
+            int count=statement.executeUpdate(query);
+            if(count==0){
+                System.out.println("Table is renamed successfully");
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
+    }
+    protected void renameColumnName(String tableName,String prevColumnName,String newColName){
+        connect();
+        query="alter table "+tableName+" rename column "+prevColumnName+" to "+newColName;
+        try {
+            int count=statement.executeUpdate(query);
+            if(count==0){
+                System.out.println("column is renamed successfully");
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }finally{
+            closeConnection();
+        }
     }
     private void closeConnection(){
         try{

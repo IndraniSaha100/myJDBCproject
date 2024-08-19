@@ -5,6 +5,10 @@ class Server_data extends StudentDAO {
         Scanner scanner = new Scanner(System.in);
         System.out.println("How much data you want to entry");
         int num = Integer.parseInt(scanner.nextLine());
+        if(num==0){
+            System.out.println("ok you don't want to put any data");
+            return;
+        }
         while (num > 0) {
             super.addData(tableName);
             num--;
@@ -16,7 +20,12 @@ class Server_data extends StudentDAO {
     }
 
     public void deleteTable(String name) {
-        super.deleteTable(name);
+        System.out.println("Do you really want to delete the table!!press 1 for yes");
+        Scanner scanner = new Scanner(System.in);
+        int num = Integer.parseInt(scanner.nextLine());
+        if(num==1) {
+            super.deleteTable(name);
+        }
     }
 
     public void showTable(String tableName) {
@@ -84,5 +93,69 @@ class Server_data extends StudentDAO {
         5. SQLException:
             Cause: Although not in the try block provided, if the super.selectByRoll() or super.selectByName() methods involve database operations, they might throw an SQLException.
             Example: Issues with the database connection, malformed SQL queries, or data-related errors.*/
+    }
+    public void numberOfStudent(String tableName){
+        super.numberOfStudent(tableName);
+    }
+    public void eraseData(String tableName){
+        System.out.println("Do you really want to remove all data!!press 1 for yes");
+        Scanner scanner = new Scanner(System.in);
+        int num = Integer.parseInt(scanner.nextLine());
+        if(num==1) {
+            super.eraseData(tableName);
+        }
+    }
+    public void showColumnName(String tableName){
+        System.out.println("Column Names are given below");
+        super.showColumnName(tableName);
+    }
+    public void changeSchema(String tableName){
+        System.out.println("What you want to change\n" +
+                "1.Add a column\n2.Delete a column\n3.Rename the column\n4.Rename the table");
+        Scanner scanner = new Scanner(System.in);
+        int choice = Integer.parseInt(scanner.nextLine());
+        String colName=null;
+        switch(choice){
+            case 1:
+                System.out.print("Already existed ");
+                showColumnName(tableName);
+                System.out.println("Enter the name of new column");
+                colName=scanner.nextLine();
+                System.out.println("Which type of data do you want to insert" +
+                        "\n1.Number\t2.Text");
+                int type=Integer.parseInt(scanner.nextLine());
+                if(type==1){
+                    super.createColumn(tableName,colName,type);
+                }
+                else if(type==2){
+                    super.createColumn(tableName,colName,type);
+                }
+                else{
+                    System.out.println("You enter wrong choice of data type");
+                }
+                break;
+            case 2:
+                showColumnName(tableName);
+                System.out.println("Which column do you want to delete");
+                colName=scanner.nextLine();
+                super.deleteColumn(tableName,colName);
+                break;
+            case 3:
+                showColumnName(tableName);
+                System.out.println("Which column do you want to rename");
+                String prevName=scanner.nextLine();
+                System.out.println("Enter new Name of the column");
+                colName=scanner.nextLine();
+                super.renameColumnName(tableName,prevName,colName);
+                break;
+            case 4:
+                System.out.println("Enter the new Name of table");
+                String newTableName=scanner.nextLine();
+                super.renameTableName(tableName,newTableName);
+                break;
+
+            default:
+                System.out.println("you enter wrong choice");
+        }
     }
 }
