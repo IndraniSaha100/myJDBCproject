@@ -1,7 +1,3 @@
-
-
-import com.mysql.cj.protocol.Resultset;
-
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -69,6 +65,8 @@ protected void deleteTable(String tableName){
     }
     catch(SQLException e){
         System.out.println(e.getMessage());
+    }finally{
+        System.out.println("Delete the table if exist");
     }
     closeConnection();
 }
@@ -122,6 +120,9 @@ protected void deleteTable(String tableName){
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally
+        {
+            System.out.println("Above printed the data");
         }
         closeConnection();
     }
@@ -217,6 +218,7 @@ protected void deleteTable(String tableName){
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }finally{
+            System.out.println("Delete the column if exist");
             closeConnection();
         }
     }

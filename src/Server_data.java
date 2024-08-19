@@ -37,7 +37,7 @@ class Server_data extends StudentDAO {
             NumberFormatException: If the user inputs a non-numeric value when prompted to enter a number (for either the search type or roll number), the code would throw a NumberFormatException, leading to a program crash. The modification includes exception handling to prevent this crash and provide user-friendly error messages.
             NoSuchElementException: If the input is not available when the scanner.nextLine() method is called, a NoSuchElementException could be thrown. This is especially problematic if the input stream is unexpectedly empty.
         2. Scanner Closure:
-            Premature Closure: The original code closes the Scanner at the end of the method. While this might seem correct, closing the Scanner that wraps System.in also closes the input stream. If you need further input from the console later in the program, it won't be available. The modification keeps the Scanner open in a broader context or closes it safely in a finally block, ensuring the program can handle further input if needed.
+            Premature Closure: The original code closes the Scanner at the end of the method. While this might seem correct, closing the Scanner that wraps System.in also closes the input stream. If you need further input from the console later in the program, it won't be available. The modification keeps the Scanner open in a broader context or closes it safely in a 'finally' block, ensuring the program can handle further input if needed.
         3. Lack of Input Validation:
             Invalid User Choices: The original code assumes the user will always input 1 or 2 when choosing the search method. If the user enters anything else, the code does not handle it, leading to incorrect behavior. The modification adds validation to ensure the user selects a valid option.*/
         Scanner scanner = new Scanner(System.in);
@@ -110,52 +110,78 @@ class Server_data extends StudentDAO {
         super.showColumnName(tableName);
     }
     public void changeSchema(String tableName){
-        System.out.println("What you want to change\n" +
-                "1.Add a column\n2.Delete a column\n3.Rename the column\n4.Rename the table");
-        Scanner scanner = new Scanner(System.in);
-        int choice = Integer.parseInt(scanner.nextLine());
-        String colName=null;
-        switch(choice){
-            case 1:
-                System.out.print("Already existed ");
-                showColumnName(tableName);
-                System.out.println("Enter the name of new column");
-                colName=scanner.nextLine();
-                System.out.println("Which type of data do you want to insert" +
-                        "\n1.Number\t2.Text");
-                int type=Integer.parseInt(scanner.nextLine());
-                if(type==1){
-                    super.createColumn(tableName,colName,type);
-                }
-                else if(type==2){
-                    super.createColumn(tableName,colName,type);
-                }
-                else{
-                    System.out.println("You enter wrong choice of data type");
-                }
-                break;
-            case 2:
-                showColumnName(tableName);
-                System.out.println("Which column do you want to delete");
-                colName=scanner.nextLine();
-                super.deleteColumn(tableName,colName);
-                break;
-            case 3:
-                showColumnName(tableName);
-                System.out.println("Which column do you want to rename");
-                String prevName=scanner.nextLine();
-                System.out.println("Enter new Name of the column");
-                colName=scanner.nextLine();
-                super.renameColumnName(tableName,prevName,colName);
-                break;
-            case 4:
-                System.out.println("Enter the new Name of table");
-                String newTableName=scanner.nextLine();
-                super.renameTableName(tableName,newTableName);
-                break;
+        do{
 
-            default:
-                System.out.println("you enter wrong choice");
-        }
+            System.out.println("""
+                    What you want to change
+                    1.Add a column
+                    2.Delete a column
+                    3.Rename the column
+                    4.Rename the table
+                    5.Exit""");
+            Scanner scanner = new Scanner(System.in);
+            int choice = Integer.parseInt(scanner.nextLine());
+            String colName;
+            switch(choice){
+                case 1:
+                    System.out.print("Already existed ");
+                    showColumnName(tableName);
+
+                    System.out.println("Enter the name of new column");
+                    colName = scanner.nextLine().trim(); // Trim to remove any leading/trailing spaces
+
+                    if (colName.isEmpty()) {
+                        System.out.println("Column name cannot be empty. Please enter a valid column name.");
+                        break; // Exit or loop back to prompt again
+                    }
+
+                    System.out.println("Which type of data do you want to insert" +
+                            "\n1.Number\t2.Text");
+                    String typeInput = scanner.nextLine().trim();
+
+                    if (typeInput.isEmpty()) {
+                        System.out.println("Data type cannot be empty. Please enter a valid data type.");
+                        break; // Exit or loop back to prompt again
+                    }
+
+                    int type;
+                    try {
+                        type = Integer.parseInt(typeInput);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid input. Please enter a number (1 for Number, 2 for Text).");
+                        break; // Exit or loop back to prompt again
+                    }
+
+                    if (type == 1 || type == 2) {
+                        super.createColumn(tableName, colName, type);
+                    } else {
+                        System.out.println("You entered a wrong choice of data type.");
+                    }
+
+                case 2:
+                    showColumnName(tableName);
+                    System.out.println("Which column do you want to delete");
+                    colName=scanner.nextLine();
+                    super.deleteColumn(tableName,colName);
+                    break;
+                case 3:
+                    showColumnName(tableName);
+                    System.out.println("Which column do you want to rename");
+                    String prevName=scanner.nextLine();
+                    System.out.println("Enter new Name of the column in one word(like newColumn)");
+                    colName=scanner.nextLine();
+                    super.renameColumnName(tableName,prevName,colName);
+                    break;
+                case 4:
+                    System.out.println("Enter the new Name of table");
+                    String newTableName=scanner.nextLine();
+                    super.renameTableName(tableName,newTableName);
+                    break;
+                case 5:
+                    System.exit(0);
+                default:
+                    System.out.println("you enter wrong choice");
+            }
+        } while(true);
     }
 }
