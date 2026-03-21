@@ -21,7 +21,7 @@ class StudentDAO {
         try {
             final  String url="jdbc:mysql://localhost:3306/Student";
             final String user="root";
-            final  String password="#Indrani20";
+            final  String password="YourPassword";
             con = DriverManager.getConnection(url, user, password);
             statement = con.createStatement();
             query="USE Student";
